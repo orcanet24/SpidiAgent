@@ -1,0 +1,25 @@
+# config.yaml - Configuración del Agente SPIDI
+
+server:
+  host: "0.0.0.0"
+  port: 8484
+  read_timeout: 30
+  write_timeout: 30
+
+database:
+  path: "data/spidi.db"
+  pool_size: 10
+
+security:
+  # Master key para cifrar contraseñas de tenants en SQLite.
+  # También se puede pasar como variable de entorno SPIDI_MASTER_KEY
+  master_key: "tu-master-key-segura-de-32-caracteres-minimo"
+  rate_limit: 100
+
+logging:
+  level: "INFO"       # DEBUG, INFO, WARN, ERROR
+  format: "text"      # text, json
+
+spidi:
+  max_requests_per_sec: 10
+  max_retries: 3

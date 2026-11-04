@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpidiAgent - Manual de Uso</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --accent: #58a6ff;
+            --accent-hover: #388bfd;
+            --success: #3fb950;
+            --warning: #d29922;
+            --error: #f85149;
+            --code-bg: #0d1117;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 0 1.5rem 1rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-header h1::before {
+            content: "⚡";
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .nav-section { padding: 0.5rem 0; }
+        
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            padding: 0.5rem 1.5rem 0.25rem;
+            font-weight: 600;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            border-left: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            background: rgba(88, 166, 255, 0.1);
+        }
+        
+        .main {
+            flex: 1;
+            margin-left: 280px;
+            max-width: 1000px;
+            padding: 2rem 3rem;
+        }
+        
+        .section { display: none; animation: fadeIn 0.3s ease; }
+        .section.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--accent);
+        }
+        
+        h4 {
+            font-size: 1.1rem;
+            margin: 1rem 0 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+        
+        ul, ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--text-secondary); }
+        li { margin-bottom: 0.25rem; }
+        
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+        }
+        
+        .card-header {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .grid .card { margin: 0; }
+        
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 0.75rem 0;
+        }
+        
+        .code-header {
+            background: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-header .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+        
+        .code-header .copy-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        pre {
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+        
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.85em;
+        }
+        
+        :not(pre) > code {
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            color: var(--accent);
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-right: 0.5rem;
+        }
+        
+        .method-get { background: rgba(63, 185, 80, 0.2); color: var(--success); }
+        .method-post { background: rgba(88, 166, 255, 0.2); color: var(--accent); }
+        .method-delete { background: rgba(248, 81, 73, 0.2); color: var(--error); }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+        }
+        
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        td { color: var(--text-secondary); }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 3px solid;
+        }
+        
+        .alert-info { background: rgba(88, 166, 255, 0.1); border-color: var(--accent); }
+        .alert-warning { background: rgba(210, 153, 34, 0.1); border-color: var(--warning); }
+        .alert-success { background: rgba(63, 185, 80, 0.1); border-color: var(--success); }
+        
+        .alert strong { color: var(--text-primary); }
+        
+        .flow {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+        
+        .flow-item {
+            background: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .flow-arrow { color: var(--text-muted); font-size: 1.2rem; }
+        
+        .status {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .status-pending { background: rgba(210, 153, 34, 0.2); color: var(--warning); }
+        .status-paid { background: rgba(63, 185, 80, 0.2); color: var(--success); }
+        .status-expired { background: rgba(110, 118, 129, 0.2); color: var(--text-muted); }
+        .status-failed { background: rgba(248, 81, 73, 0.2); color: var(--error); }
+        
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 200;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; padding: 1.5rem; padding-top: 3.5rem; }
+            .menu-toggle { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1>SpidiAgent</h1>
+            <p>Proxy Multi-tenant para SPIDI</p>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Introducción</div>
+            <div class="nav-item active" data-section="overview">📋 Descripción General</div>
+            <div class="nav-item" data-section="architecture">🏗️ Arquitectura</div>
+            <div class="nav-item" data-section="security">🔒 Seguridad</div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Inicio Rápido</div>
+            <div class="nav-item" data-section="quick-start">⚡ Quick Start</div>
+            <div class="nav-item" data-section="config">⚙️ Configuración</div>
+            <div class="nav-item" data-section="install">📦 Instalación</div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">API REST</div>
+            <div class="nav-item" data-section="api-tenants">👥 Clientes (Tenants)</div>
+            <div class="nav-item" data-section="api-payments">💳 Pagos</div>
+            <div class="nav-item" data-section="api-webhooks">🔔 Webhooks</div>
+            <div class="nav-item" data-section="api-health">❤️ Health</div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Flujos</div>
+            <div class="nav-item" data-section="flow-payment">🛒 Flujo de Pago</div>
+            <div class="nav-item" data-section="flow-tenant">👤 Registro de Cliente</div>
+            <div class="nav-item" data-section="flow-webhook">📨 Proceso de Webhook</div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Base de Datos</div>
+            <div class="nav-item" data-section="db-schema">🗄️ Esquema</div>
+            <div class="nav-item" data-section="db-audit">📝 Auditoría</div>
+            <div class="nav-item" data-section="db-sessions">📊 Sesiones</div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Operación</div>
+            <div class="nav-item" data-section="ops-logs">📜 Logs</div>
+            <div class="nav-item" data-section="ops-queues">🔄 Colas</div>
+            <div class="nav-item" data-section="ops-shutdown">🛑 Shutdown</div>
+            <div class="nav-item" data-section="troubleshoot">🔧 Troubleshooting</div>
+        </div>
+    </nav>
+    
+    <main class="main">
+        <section id="overview" class="section active">
+            <h2>Descripción General</h2>
+            <p>SpidiAgent es un proxy multi-tenant que abstrae la complejidad de la API de SPIDI, permitiendo que tus sistemas y clientes se integren con una API REST simple mientras él maneja toda la lógica de autenticación, rate limiting, reintentos, cifrado y auditoría.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">🔐 Multi-tenant</div>
+                    <p>Cada cliente tiene sus propias credenciales SPIDI, agreement IDs y configuración aislada.</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">📊 Auditoría completa</div>
+                    <p>Cada operación se registra en SQLite con request/response JSON, duración, IP y errores.</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">🔄 Colas inteligentes</div>
+                    <p>Rate limiting y retry exponencial automático hacia la API de SPIDI.</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">🔒 Cifrado AES-256</div>
+                    <p>Contraseñas cifradas en reposo con AES-256-GCM + key derivation Argon2.</p>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>Filosofía:</strong> Tus clientes no necesitan conocer SPIDI. El agente traduce tu API simple a la API compleja de SPIDI.
+            </div>
+            
+            <h3>Stack Tecnológico</h3>
+            <table>
+                <tr><th>Componente</th><th>Tecnología</th><th>Propósito</th></tr>
+                <tr><td>Lenguaje</td><td>Go 1.26</td><td>Binario único, sin dependencias externas</td></tr>
+                <tr><td>Base de datos</td><td>SQLite (WAL mode)</td><td>Logs, auditoría, sesiones, tenants</td></tr>
+                <tr><td>Driver SQL</td><td>modernc.org/sqlite</td><td>Puro Go, no requiere CGO</td></tr>
+                <tr><td>Cifrado</td><td>AES-256-GCM + Argon2</td><td>Protección de contraseñas en reposo</td></tr>
+                <tr><td>HTTP</td><td>net/http</td><td>Servidor REST estándar</td></tr>
+                <tr><td>Configuración</td><td>YAML + Entorno</td><td>Flexibilidad deployment</td></tr>
+                <tr><td>Logging</td><td>slog</td><td>Logs estructurados (JSON/text)</td></tr>
+            </table>
+        </section>
+        
+        <section id="architecture" class="section">
+            <h2>Arquitectura</h2>
+            
+            <h3>Flujo de una solicitud de pago</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Diagrama</span></div>
+                <pre>
+┌─────────────────────────────────────────────────────────────┐
+│                    TUS SISTEMAS / CLIENTES                    │
+│  (ecommerce, app móvil, dashboard, ERP interno, clientes)    │
+└──────────────────────────┬──────────────────────────────────┘
+                           │  API simple (tu dominio)
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    MIDDLEWARE HTTP                            │
+│  - Auth por X-Tenant-Key                                     │
+│  - Rate limiting                                             │
+│  - Request logging                                           │
+└──────────────────────────┬──────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                         HANDLERS                             │
+│  - POST /pagos → PaymentHandler                              │
+│  - POST /clientes → TenantHandler                            │
+│  - POST /webhook → WebhookHandler                            │
+└──────────────────────────┬──────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                        SERVICE                               │
+│  - Orquesta SPIDI + SQLite + Colas                           │
+│  - Registra operaciones en log                               │
+└────────────┬────────────────────────┬───────────────────────┘
+             │                        │
+             ▼                        ▼
+┌────────────────────┐   ┌───────────────────────────────┐
+│   CLIENTE SPIDI    │   │         SQLITE DB             │
+│   (HTTP client)    │   │  ┌─────────────────────────┐  │
+│   - Token cache    │   │  │ tenants                  │  │
+│   - Retry + backoff│   │  │ sessions                 │  │
+│   - Login refresh  │   │  │ operation_log (auditoría)│  │
+└────────────────────┘   │  │ audit_chain              │  │
+                         │  └─────────────────────────┘  │
+                         │  Worker serializado (WAL mode)│
+                         └───────────────────────────────┘</pre>
+            </div>
+            
+            <h3>Estructura de Archivos</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Árbol del proyecto</span></div>
+                <pre>
+spidi-agent/
+├── cmd/
+│   └── server/
+│       └── main.go              # Entrypoint, graceful shutdown
+├── internal/
+│   ├── config/
+│   │   └── config.go            # Carga YAML + env vars
+│   ├── crypto/
+│   │   └── crypto.go            # AES-GCM, bcrypt, Argon2
+│   ├── database/
+│   │   └── database.go          # SQLite WAL + write worker
+│   ├── handlers/
+│   │   └── handlers.go          # HTTP endpoints
+│   ├── logger/
+│   │   └── logger.go            # slog wrapper
+│   ├── middleware/
+│   │   └── middleware.go        # Auth + logging middleware
+│   ├── models/
+│   │   └── models.go            # Estructuras de datos
+│   ├── queue/
+│   │   └── queue.go            # Rate limiter + retry
+│   ├── service/
+│   │   └── service.go          # Orquestador principal
+│   ├── spidi/
+│   │   └── spidi.go            # Cliente API SPIDI
+│   └── tenant/
+│       └── store.go            # CRUD tenants cifrado
+├── config.yaml.example
+├── go.mod
+└── spidi-agent.exe              # Binario compilado</pre>
+            </div>
+        </section>
+        
+        <section id="security" class="section">
+            <h2>Seguridad</h2>
+            
+            <h3>Cifrado de Contraseñas</h3>
+            <div class="flow">
+                <span class="flow-item">Master Key</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">Argon2id (3 iter, 64MB, 4 threads)</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">Clave AES-256</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">AES-GCM encrypt</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">base64(salt+nonce+ciphertext)</span>
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ Importante:</strong> El <code>master_key</code> debe tener al menos 32 caracteres y guardarse en un secreto seguro. Si se pierde, las contraseñas cifradas no se pueden recuperar.
+            </div>
+            
+            <h3>Autenticación de Tenants</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Headers de autenticación</span></div>
+                <pre>X-Tenant-Key: ak_7f3a9b2c4d5e6f7a8b9c0d1e2f3a4b5c
+
+# O alternativamente:
+Authorization: Bearer ak_7f3a9b2c4d5e6f7a8b9c0d1e2f3a4b5c</pre>
+            </div>
+            
+            <h3>Protecciones Implementadas</h3>
+            <table>
+                <tr><th>Feature</th><th>Implementación</th></tr>
+                <tr><td>Cifrado en reposo</td><td>AES-256-GCM con Argon2id KDF</td></tr>
+                <tr><td>Comparación de contraseñas</td><td>Constant-time (resistente a timing attacks)</td></tr>
+                <tr><td>SQL Injection</td><td>Prepared statements (database/sql parametrizado)</td></tr>
+                <tr><td>Rate limiting</td><td>Por tenant (configurable req/sec)</td></tr>
+                <tr><td>Concurrencia SQLite</td><td>Worker serializado + WAL mode + busy_timeout</td></tr>
+                <tr><td>Secrets en config</td><td>Soporta env vars (SPIDI_MASTER_KEY)</td></tr>
+                <tr><td>Graceful shutdown</td><td>Drena colas antes de cerrar</td></tr>
+            </table>
+        </section>
+        
+        <section id="quick-start" class="section">
+            <h2>Quick Start</h2>
+            
+            <h3>1. Compilar</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>cd C:\Proyectos\GO\SpidiAgent
+set CGO_ENABLED=0
+go build -o spidi-agent.exe ./cmd/server</pre>
+            </div>
+            
+            <h3>2. Configurar</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>copy config.yaml.example config.yaml
+# Editar config.yaml con tu master key</pre>
+            </div>
+            
+            <h3>3. Iniciar</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>set SPIDI_MASTER_KEY=tu-master-key-segura-de-32-caracteres-minimo
+spidi-agent.exe</pre>
+            </div>
+            
+            <h3>4. Probar</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Bash</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>curl http://localhost:8484/health</pre>
+            </div>
+            
+            <div class="alert alert-success">
+                <strong>¡Listo!</strong> El agente está corriendo en el puerto 8484.
+            </div>
+        </section>
+        
+        <section id="config" class="section">
+            <h2>Configuración</h2>
+            
+            <h3>config.yaml</h3>
+            <div class="code-block">
+                <div class="code-header"><span>config.yaml</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>server:
+  host: "0.0.0.0"
+  port: 8484
+  read_timeout: 30
+  write_timeout: 30
+
+database:
+  path: "data/spidi.db"
+  pool_size: 10
+
+security:
+  master_key: "clave-de-32+caracteres-segura"
+  rate_limit: 100
+
+logging:
+  level: "INFO"
+  format: "text"
+
+spidi:
+  max_requests_per_sec: 10
+  max_retries: 3</pre>
+            </div>
+            
+            <h3>Variables de Entorno</h3>
+            <table>
+                <tr><th>Variable</th><th>Descripción</th><th>Requerida</th></tr>
+                <tr><td><code>SPIDI_MASTER_KEY</code></td><td>Clave maestra para cifrar contraseñas</td><td>✅ Sí</td></tr>
+            </table>
+        </section>
+        
+        <section id="install" class="section">
+            <h2>Instalación</h2>
+            <h3>Requisitos</h3>
+            <ul>
+                <li>Go 1.22+ (solo para compilar)</li>
+                <li>Windows/Linux/macOS</li>
+                <li>SQLite se incluye en el binario (no requiere instalación)</li>
+            </ul>
+            
+            <h3>Servicio Windows</h3>
+            <div class="code-block">
+                <div class="code-header"><span>PowerShell (admin)</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>sc create SpidiAgent binPath= "C:\ruta\spidi-agent.exe" start= auto
+sc description SpidiAgent "Proxy multi-tenant para pasarela SPIDI"
+net start SpidiAgent</pre>
+            </div>
+        </section>
+        
+        <section id="api-tenants" class="section">
+            <h2>API - Clientes (Tenants)</h2>
+            
+            <h3><span class="method method-post">POST</span> /clientes</h3>
+            <p>Registra un nuevo cliente con sus credenciales SPIDI.</p>
+            
+            <h4>Request Body</h4>
+            <div class="code-block">
+                <div class="code-header"><span>JSON</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>{
+    "name": "Tienda Demo C.A.",
+    "short_name": "tienda_demo",
+    "password": "Demo1234!",
+    "bank_account_id": "uuid-banco-001",
+    "environment": "sandbox",
+    "callback_base_url": "https://tienda-demo.com/api"
+}</pre>
+            </div>
+            
+            <h4>Response 201</h4>
+            <div class="code-block">
+                <div class="code-header"><span>JSON</span></div>
+                <pre>{
+    "success": true,
+    "data": {
+        "tenant_id": "7f3a9b2c4d5e6f7a8b9c0d1e2f3a4b5c",
+        "short_name": "tienda_demo",
+        "api_key": "ak_7f3a9b2c4d5e6f7a8b9c0d1e2f3a4b5c",
+        "environment": "sandbox",
+        "created_at": "2024-01-15T10:30:00Z"
+    }
+}</pre>
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ Guarda el api_key:</strong> No se puede recuperar después.
+            </div>
+            
+            <h3><span class="method method-get">GET</span> /clientes</h3>
+            <p>Lista todos los tenants (sin contraseñas).</p>
+            
+            <h3><span class="method method-delete">DELETE</span> /clientes/:id</h3>
+            <p>Elimina un tenant permanentemente.</p>
+        </section>
+        
+        <section id="api-payments" class="section">
+            <h2>API - Pagos</h2>
+            
+            <h3><span class="method method-post">POST</span> /pagos</h3>
+            <p>Crea una nueva sesión de pago.</p>
+            
+            <h4>Headers</h4>
+            <div class="code-block">
+                <div class="code-header"><span>HTTP Headers</span></div>
+                <pre>Content-Type: application/json
+X-Tenant-Key: ak_7f3a9b2c4d5e6f7a8b9c0d1e2f3a4b5c</pre>
+            </div>
+            
+            <h4>Request Body</h4>
+            <div class="code-block">
+                <div class="code-header"><span>JSON</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>{
+    "tenant_id": "7f3a9b2c4d5e6f7a8b9c0d1e2f3a4b5c",
+    "monto": 50.00,
+    "moneda": "USD",
+    "orden": "ORD-2024-001",
+    "descripcion": "Compra producto X",
+    "url_exito": "https://tienda.com/pago/exitoso",
+    "url_fallo": "https://tienda.com/pago/fallido"
+}</pre>
+            </div>
+            
+            <h4>Campos</h4>
+            <table>
+                <tr><th>Campo</th><th>Tipo</th><th>Req.</th><th>Descripción</th></tr>
+                <tr><td><code>tenant_id</code></td><td>string</td><td>✅</td><td>ID del tenant</td></tr>
+                <tr><td><code>monto</code></td><td>number</td><td>✅</td><td>Monto (2 decimales)</td></tr>
+                <tr><td><code>moneda</code></td><td>string</td><td>✅</td><td>USD, EUR, COP, USDT, VES</td></tr>
+                <tr><td><code>orden</code></td><td>string</td><td>✅</td><td>ID de orden del comercio</td></tr>
+                <tr><td><code>descripcion</code></td><td>string</td><td>❌</td><td>Concepto (500 chars max)</td></tr>
+                <tr><td><code>url_exito</code></td><td>string</td><td>❌</td><td>Redirección post-pago</td></tr>
+                <tr><td><code>url_fallo</code></td><td>string</td><td>❌</td><td>Redirección fallo</td></tr>
+            </table>
+            
+            <h4>Response 201</h4>
+            <div class="code-block">
+                <div class="code-header"><span>JSON</span></div>
+                <pre>{
+    "success": true,
+    "data": {
+        "session_id": "3ddc4cfb-c09a-43de-92c1-e4a069732e90",
+        "tenant_id": "7f3a9b2c...",
+        "orden": "ORD-2024-001",
+        "payment_url": "https://sandbox.mispidi.com/?id=3ddc4cfb...",
+        "moneda": "USD",
+        "monto": 50.0,
+        "status": "pending",
+        "creado_en": "2024-01-15T10:30:00Z"
+    }
+}</pre>
+            </div>
+            
+            <h4>Errores</h4>
+            <table>
+                <tr><th>HTTP</th><th>Error</th><th>Causa</th></tr>
+                <tr><td>400</td><td>invalid JSON</td><td>Body mal formado</td></tr>
+                <tr><td>401</td><td>missing tenant key</td><td>Sin header X-Tenant-Key</td></tr>
+                <tr><td>403</td><td>invalid tenant key</td><td>API key no existe</td></tr>
+                <tr><td>404</td><td>tenant not found</td><td>tenant_id inválido</td></tr>
+                <tr><td>429</td><td>rate limit</td><td>Demasiadas requests</td></tr>
+                <tr><td>500</td><td>payment: spidi: ...</td><td>Error API SPIDI</td></tr>
+            </table>
+            
+            <h3><span class="method method-get">GET</span> /pagos/:id</h3>
+            <p>Consulta el estado de un pago.</p>
+            
+            <h4>Response 200</h4>
+            <div class="code-block">
+                <div class="code-header"><span>JSON</span></div>
+                <pre>{
+    "success": true,
+    "data": {
+        "session_id": "3ddc4cfb-...",
+        "status": "paid",
+        "payment_method": "immediate_debit",
+        "transaction_id": "643",
+        "transaction_url": "https://mispidi.com/success?id=...",
+        "amount_ves": 6100.56,
+        "paid_at": "2024-01-15T10:35:00Z"
+    }
+}</pre>
+            </div>
+            
+            <h4>Estados</h4>
+            <table>
+                <tr><th>Estado</th><th>Significado</th></tr>
+                <tr><td><span class="status status-pending">pending</span></td><td>Esperando pago</td></tr>
+                <tr><td><span class="status status-paid">paid</span></td><td>✅ Completado</td></tr>
+                <tr><td><span class="status status-expired">expired</span></td><td>Expirado</td></tr>
+                <tr><td><span class="status status-failed">failed</span></td><td>Fallido</td></tr>
+            </table>
+        </section>
+        
+        <section id="api-webhooks" class="section">
+            <h2>API - Webhooks</h2>
+            
+            <h3><span class="method method-post">POST</span> /webhook</h3>
+            <p>Endpoint donde SPIDI envía las notificaciones de eventos.</p>
+            
+            <h4>Eventos</h4>
+            <table>
+                <tr><th>Evento</th><th>Descripción</th></tr>
+                <tr><td><code>payment.paid</code></td><td>Pago completado</td></tr>
+                <tr><td><code>payment.settled</code></td><td>Liquidación al receptor</td></tr>
+                <tr><td><code>payment.expired</code></td><td>Sesión expirada</td></tr>
+                <tr><td><code>payment.failed</code></td><td>Pago fallido</td></tr>
+            </table>
+            
+            <h4>Payload</h4>
+            <div class="code-block">
+                <div class="code-header"><span>JSON</span></div>
+                <pre>{
+    "event_id": "evt_abc123",
+    "event_type": "payment.paid",
+    "session_id": "3ddc4cfb-c09a-43de-92c1-e4a069732e90",
+    "tenant_id": "7f3a9b2c...",
+    "timestamp": "2024-01-15T10:35:00Z",
+    "data": {
+        "amount_ves": 6100.56,
+        "payment_method": "immediate_debit",
+        "reference": "00001440"
+    }
+}</pre>
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>Idempotencia:</strong> Los webhooks se reintentan hasta 3 veces si el callback del tenant falla.
+            </div>
+        </section>
+        
+        <section id="api-health" class="section">
+            <h2>Health Check</h2>
+            
+            <h3><span class="method method-get">GET</span> /health</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Response</span></div>
+                <pre>{"success":true,"data":{"status":"healthy"}}</pre>
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>💡 Tip:</strong> Usa este endpoint para health checks en load balancers o monitoreo.
+            </div>
+        </section>
+        
+        <section id="flow-payment" class="section">
+            <h2>Flujo Completo de Pago</h2>
+            
+            <div class="card">
+                <div class="card-header">1️⃣ Cliente finaliza compra</div>
+                <div class="code-block">
+                    <pre>POST /pagos
+{
+    "tenant_id": "7f3a9b2c...",
+    "monto": 50,
+    "moneda": "USD",
+    "orden": "ORD-001"
+}</pre>
+                </div>
+            </div>
+            
+            <div style="text-align: center; color: var(--accent); font-size: 1.5rem; margin: 0.5rem 0;">⬇️</div>
+            
+            <div class="card">
+                <div class="card-header">2️⃣ Agent procesa internamente</div>
+                <ul>
+                    <li>Valida tenant y API key</li>
+                    <li>Obtiene token JWT SPIDI (cacheado)</li>
+                    <li>Reutiliza agreement_id del tenant</li>
+                    <li>Llama a SPIDI con rate limiting</li>
+                    <li>Registra en SQLite (operation_log + sessions)</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; color: var(--accent); font-size: 1.5rem; margin: 0.5rem 0;">⬇️</div>
+            
+            <div class="card">
+                <div class="card-header">3️⃣ Regresa payment_url</div>
+                <div class="code-block">
+                    <pre>{
+    "payment_url": "https://sandbox.mispidi.com/?id=3ddc4cfb...",
+    "session_id": "3ddc4cfb..."
+}</pre>
+                </div>
+            </div>
+            
+            <div style="text-align: center; color: var(--accent); font-size: 1.5rem; margin: 0.5rem 0;">⬇️</div>
+            
+            <div class="card">
+                <div class="card-header">4️⃣ Cliente paga en SPIDI</div>
+                <p>Rediriges al usuario a la <code>payment_url</code>.</p>
+            </div>
+            
+            <div style="text-align: center; color: var(--accent); font-size: 1.5rem; margin: 0.5rem 0;">⬇️</div>
+            
+            <div class="card">
+                <div class="card-header">5️⃣ Webhook notifica resultado</div>
+                <p>SPIDI → POST /webhook del agente → POST callback del tenant</p>
+            </div>
+            
+            <div style="text-align: center; color: var(--accent); font-size: 1.5rem; margin: 0.5rem 0;">⬇️</div>
+            
+            <div class="card">
+                <div class="card-header">6️⃣ Confirmas producto/servicio</div>
+                <p>Tu sistema recibe el webhook y entrega el producto al cliente.</p>
+            </div>
+        </section>
+        
+        <section id="flow-tenant" class="section">
+            <h2>Flujo de Registro de Cliente</h2>
+            <div class="card">
+                <div class="card-header">Paso 1: Registrar tenant</div>
+                <div class="code-block">
+                    <pre>POST /clientes
+{
+    "name": "Mi Tienda",
+    "short_name": "mitienda",
+    "password": "password-spidi",
+    "bank_account_id": "uuid-cuenta",
+    "environment": "sandbox"
+}</pre>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Paso 2: Recibir API key</div>
+                <div class="code-block">
+                    <pre>{
+    "tenant_id": "abc123...",
+    "api_key": "ak_abc123..."
+}</pre>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Paso 3: Usar API key en cada request</div>
+                <div class="code-block">
+                    <pre>POST /pagos
+X-Tenant-Key: ak_abc123...</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section id="flow-webhook" class="section">
+            <h2>Proceso de Webhook</h2>
+            <div class="card">
+                <div class="card-header">SPIDI → Agente</div>
+                <div class="code-block">
+                    <pre>POST /webhook
+{
+    "event_type": "payment.paid",
+    "session_id": "3ddc4cfb...",
+    "data": { "amount_ves": 100.50 }
+}</pre>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Agente procesa</div>
+                <ul>
+                    <li>Actualiza estado en SQLite</li>
+                    <li>Registra en operation_log</li>
+                    <li>Reenvía al callback del tenant</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-header">Agente → Tenant</div>
+                <div class="code-block">
+                    <pre>POST https://tienda.com/api/webhook/spidi
+{
+    "event_type": "payment.paid",
+    "session_id": "3ddc4cfb...",
+    "data": { "amount_ves": 100.50 }
+}</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section id="db-schema" class="section">
+            <h2>Esquema de Base de Datos</h2>
+            
+            <h3>Tabla: <code>tenants</code></h3>
+            <table>
+                <tr><th>Columna</th><th>Tipo</th><th>Descripción</th></tr>
+                <tr><td><code>id</code></td><td>TEXT (PK)</td><td>UUID v4</td></tr>
+                <tr><td><code>name</code></td><td>TEXT</td><td>Nombre del comercio</td></tr>
+                <tr><td><code>short_name</code></td><td>TEXT (UNIQUE)</td><td>short_name SPIDI</td></tr>
+                <tr><td><code>password_encrypted</code></td><td>TEXT</td><td>Contraseña cifrada AES-256-GCM</td></tr>
+                <tr><td><code>agreement_id</code></td><td>TEXT</td><td>ID del agreement SPIDI</td></tr>
+                <tr><td><code>environment</code></td><td>TEXT</td><td>sandbox / production</td></tr>
+                <tr><td><code>callback_base_url</code></td><td>TEXT</td><td>URL para callbacks</td></tr>
+                <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>Fecha creación</td></tr>
+                <tr><td><code>updated_at</code></td><td>TIMESTAMP</td><td>Última actualización</td></tr>
+            </table>
+            
+            <h3>Tabla: <code>sessions</code></h3>
+            <table>
+                <tr><th>Columna</th><th>Tipo</th><th>Descripción</th></tr>
+                <tr><td><code>id</code></td><td>TEXT (PK)</td><td>UUID de la sesión</td></tr>
+                <tr><td><code>tenant_id</code></td><td>TEXT (FK)</td><td>Tenant propietario</td></tr>
+                <tr><td><code>order_id</code></td><td>TEXT</td><td>ID de orden del comercio</td></tr>
+                <tr><td><code>payment_url</code></td><td>TEXT</td><td>URL de pago SPIDI</td></tr>
+                <tr><td><code>currency</code></td><td>TEXT</td><td>Moneda (USD, EUR, etc.)</td></tr>
+                <tr><td><code>amount</code></td><td>REAL</td><td>Monto</td></tr>
+                <tr><td><code>status</code></td><td>TEXT</td><td>pending/paid/expired/failed</td></tr>
+                <tr><td><code>spidi_session_id</code></td><td>TEXT</td><td>ID de sesión en SPIDI</td></tr>
+                <tr><td><code>expires_at</code></td><td>TIMESTAMP</td><td>Expiración</td></tr>
+                <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>Creación</td></tr>
+            </table>
+            
+            <h3>Tabla: <code>operation_log</code></h3>
+            <table>
+                <tr><th>Columna</th><th>Tipo</th><th>Descripción</th></tr>
+                <tr><td><code>id</code></td><td>INTEGER (PK, AUTO)</td><td>Autoincrement</td></tr>
+                <tr><td><code>tenant_id</code></td><td>TEXT (FK)</td><td>Tenant asociado</td></tr>
+                <tr><td><code>operation</code></td><td>TEXT</td><td>create_payment, check_status, etc.</td></tr>
+                <tr><td><code>resource_id</code></td><td>TEXT</td><td>ID del recurso afectado</td></tr>
+                <tr><td><code>status</code></td><td>TEXT</td><td>success / error</td></tr>
+                <tr><td><code>request_json</code></td><td>TEXT</td><td>Payload de entrada</td></tr>
+                <tr><td><code>response_json</code></td><td>TEXT</td><td>Respuesta del agente</td></tr>
+                <tr><td><code>error_message</code></td><td>TEXT</td><td>Mensaje de error si aplica</td></tr>
+                <tr><td><code>duration_ms</code></td><td>INTEGER</td><td>Duración en ms</td></tr>
+                <tr><td><code>client_ip</code></td><td>TEXT</td><td>IP del cliente</td></tr>
+                <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>Timestamp</td></tr>
+            </table>
+            
+            <h3>Tabla: <code>audit_chain</code></h3>
+            <table>
+                <tr><th>Columna</th><th>Tipo</th><th>Descripción</th></tr>
+                <tr><td><code>table_name</code></td><td>TEXT</td><td>Tabla afectada</td></tr>
+                <tr><td><code>row_id</code></td><td>TEXT</td><td>ID de fila</td></tr>
+                <tr><td><code>action</code></td><td>TEXT</td><td>INSERT / UPDATE / DELETE</td></tr>
+                <tr><td><code>before_json</code></td><td>TEXT</td><td>Estado anterior (JSON)</td></tr>
+                <tr><td><code>after_json</code></td><td>TEXT</td><td>Estado nuevo (JSON)</td></tr>
+                <tr><td><code>actor</code></td><td>TEXT</td><td>Quién ejecutó la acción</td></tr>
+            </table>
+        </section>
+        
+        <section id="db-audit" class="section">
+            <h2>Auditoría</h2>
+            
+            <h3>Consultas SQL Útiles</h3>
+            
+            <h4>Últimas 10 operaciones de un tenant</h4>
+            <div class="code-block">
+                <div class="code-header"><span>SQL</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>SELECT operation, resource_id, status, duration_ms, created_at
+FROM operation_log
+WHERE tenant_id = '7f3a9b2c...'
+ORDER BY created_at DESC
+LIMIT 10;</pre>
+            </div>
+            
+            <h4>Operaciones fallidas (últimas 24h)</h4>
+            <div class="code-block">
+                <div class="code-header"><span>SQL</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>SELECT tenant_id, operation, error_message, created_at
+FROM operation_log
+WHERE status = 'error'
+  AND created_at >= datetime('now', '-1 day')
+ORDER BY created_at DESC;</pre>
+            </div>
+            
+            <h4>Resumen de pagos por estado</h4>
+            <div class="code-block">
+                <div class="code-header"><span>SQL</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>SELECT status, COUNT(*) as total, SUM(amount) as monto_total
+FROM sessions
+WHERE tenant_id = '7f3a9b2c...'
+GROUP BY status;</pre>
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>💡 Tip:</strong> Usa <code>DB Browser for SQLite</code> para visualizar la BD gráficamente.
+            </div>
+        </section>
+        
+        <section id="db-sessions" class="section">
+            <h2>Sesiones de Pago</h2>
+            
+            <h3>Ciclo de Vida</h3>
+            <div class="flow">
+                <span class="flow-item"><span class="status status-pending">pending</span></span>
+                <span class="flow-arrow">→ paga →</span>
+                <span class="flow-item"><span class="status status-paid">paid</span></span>
+                <span class="flow-arrow">ó</span>
+                <span class="flow-item"><span class="status status-expired">expired</span></span>
+                <span class="flow-arrow">ó</span>
+                <span class="flow-item"><span class="status status-failed">failed</span></span>
+            </div>
+            
+            <h3>Consultas SQL</h3>
+            
+            <h4>Pagos pendientes</h4>
+            <div class="code-block">
+                <div class="code-header"><span>SQL</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>SELECT id, order_id, amount, currency, created_at
+FROM sessions
+WHERE tenant_id = '7f3a9b2c...' AND status = 'pending'
+ORDER BY created_at DESC;</pre>
+            </div>
+            
+            <h4>Ventas del día (pagadas)</h4>
+            <div class="code-block">
+                <div class="code-header"><span>SQL</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                <pre>SELECT COUNT(*) as transacciones, SUM(amount) as total
+FROM sessions
+WHERE tenant_id = '7f3a9b2c...'
+  AND status = 'paid'
+  AND date(created_at) = date('now');</pre>
+            </div>
+        </section>
+        
+        <section id="ops-logs" class="section">
+            <h2>Logs y Monitoreo</h2>
+            
+            <h3>Formato text</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Log output</span></div>
+                <pre>time=2024-01-15T10:30:00-04:00 level=INFO msg="spidi agent starting" addr=0.0.0.0:8484
+time=2024-01-15T10:35:12-04:00 level=INFO msg="request" method=POST path=/pagos status=201 duration=342ms</pre>
+            </div>
+            
+            <h3>Formato JSON</h3>
+            <div class="code-block">
+                <div class="code-header"><span>logging.format: json</span></div>
+                <pre>{"time":"2024-01-15T10:30:00-04:00","level":"INFO","msg":"spidi agent starting","addr":"0.0.0.0:8484"}</pre>
+            </div>
+            
+            <h3>Niveles</h3>
+            <table>
+                <tr><th>Nivel</th><th>Qué muestra</th></tr>
+                <tr><td><code>DEBUG</code></td><td>Cada query SQL, headers de requests, tokens refresh</td></tr>
+                <tr><td><code>INFO</code></td><td>Operaciones normales, startup, shutdown</td></tr>
+                <tr><td><code>WARN</code></td><td>Reintentos, rate limit cerca del límite</td></tr>
+                <tr><td><code>ERROR</code></td><td>Fallos de SPIDI, errores de BD, panic</td></tr>
+            </table>
+        </section>
+        
+        <section id="ops-queues" class="section">
+            <h2>Colas y Concurrencia</h2>
+            
+            <h3>Cola de Escrituras SQLite</h3>
+            <p>Todas las escrituras pasan por un <strong>worker serializado</strong> (canal con buffer 1000).</p>
+            <ul>
+                <li>Nunca <code>SQLITE_BUSY</code></li>
+                <li>Operaciones en orden FIFO</li>
+                <li>Lecturas en paralelo (pool de conexiones)</li>
+            </ul>
+            
+            <h3>Cola de Requests a SPIDI</h3>
+            <table>
+                <tr><th>Parámetro</th><th>Default</th><th>Descripción</th></tr>
+                <tr><td>max_requests_per_sec</td><td>10</td><td>Máximo de requests por segundo</td></tr>
+                <tr><td>max_retries</td><td>3</td><td>Reintentos ante fallo</td></tr>
+                <tr><td>base_delay</td><td>500ms</td><td>Delay inicial (se duplica cada retry)</td></tr>
+            </table>
+            
+            <h4>Secuencia de Retry</h4>
+            <div class="flow">
+                <span class="flow-item">Intento 1</span>
+                <span class="flow-arrow">→ falla →</span>
+                <span class="flow-item">delay 500ms</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">Intento 2</span>
+                <span class="flow-arrow">→ falla →</span>
+                <span class="flow-item">delay 1s</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">Intento 3</span>
+                <span class="flow-arrow">→ falla →</span>
+                <span class="flow-item">delay 2s</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">Intento 4</span>
+                <span class="flow-arrow">→ error</span>
+            </div>
+        </section>
+        
+        <section id="ops-shutdown" class="section">
+            <h2>Graceful Shutdown</h2>
+            <ol>
+                <li>El servidor HTTP deja de aceptar conexiones nuevas</li>
+                <li>Las conexiones activos terminan gracefully (hasta timeout)</li>
+                <li>La cola de escrituras se drena (procesa ops pendientes)</li>
+                <li>La base de datos se cierra limpiamente</li>
+            </ol>
+            <div class="alert alert-success">
+                <strong>Garantía:</strong> Ninguna operación en cola se pierde.
+            </div>
+        </section>
+        
+        <section id="troubleshoot" class="section">
+            <h2>Troubleshooting</h2>
+            
+            <table>
+                <tr><th>Problema</th><th>Causa</th><th>Solución</th></tr>
+                <tr><td><code>tenant: not found</code></td><td>tenant_id inválido</td><td>Verificar ID registrado</td></tr>
+                <tr><td><code>spidi: http 401</code></td><td>Credenciales incorrectas</td><td>Verificar short_name/password</td></tr>
+                <tr><td><code>spidi: http 429</code></td><td>Rate limit</td><td>Reducir max_requests_per_sec</td></tr>
+                <tr><td><code>missing tenant key</code></td><td>Sin header</td><td>Agregar X-Tenant-Key</td></tr>
+                <tr><td>Puerto en uso</td><td>Otto proceso</td><td>Cambiar port en config</td></tr>
+                <tr><td>"CC environment variable"</td><td>gcc mal config</td><td>Usar CGO_ENABLED=0</td></tr>
+            </table>
+            
+            <h3>Debug Mode</h3>
+            <div class="code-block">
+                <div class="code-header"><span>config.yaml</span></div>
+                <pre>logging:
+  level: "DEBUG"</pre>
+            </div>
+        </section>
+    </main>
+    
+    <script>
+        // Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.section');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = item.dataset.section;
+                
+                navItems.forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+                
+                document.getElementById('sidebar').classList.remove('open');
+                window.scrollTo(0, 0);
+            });
+        });
+        
+        // Mobile menu toggle
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+        
+        // Copy code buttons
+        function copyCode(btn) {
+            const codeBlock = btn.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const original = btn.textContent;
+                btn.textContent = '✓ Copiado!';
+                btn.style.background = 'var(--success)';
+                btn.style.borderColor = 'var(--success)';
+                btn.style.color = 'white';
+                
+                setTimeout(() => {
+                    btn.textContent = original;
+                    btn.style.background = '';
+                    btn.style.borderColor = '';
+                    btn.style.color = '';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
